@@ -1,0 +1,6 @@
+@Tokobaju_HostAddress = http://localhost:5145
+
+GET {{Tokobaju_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
