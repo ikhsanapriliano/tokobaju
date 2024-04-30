@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Tokobaju.Enums;
 
 namespace Tokobaju.Entities;
 
@@ -18,10 +19,10 @@ public class User
     public required string Email { get; set; }
     
     [Required, Column("password")]
-    public string? Password { get; set; }
+    public required string Password { get; set; }
     
     [Required, Column("role")]
-    public required string Role { get; set; }
+    public ERole Role { get; set; }
 
     [Required,Column("photo")]    
     public required string Photo { get; set; }

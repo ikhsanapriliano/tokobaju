@@ -1,4 +1,4 @@
-namespace Tokobaju.Controller;
+namespace Tokobaju.Controllers;
 
 public class UserController 
 {

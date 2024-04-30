@@ -1,8 +1,9 @@
 using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Tokobaju.Dto;
 using Tokobaju.Exceptions;
 
-namespace Tokobagus.Middlewares;
+namespace Tokobaju.Middlewares;
 
 public class HandleExceptionMiddleware : IMiddleware
 {
@@ -19,6 +20,10 @@ public class HandleExceptionMiddleware : IMiddleware
         {
             await next(context);
         }
+        catch (BadRequestException e)
+        {
+            await HandleExceptionAsync(context, e);
+        }
         catch (NotFoundException e)
         {
             await HandleExceptionAsync(context, e);
@@ -33,19 +38,30 @@ public class HandleExceptionMiddleware : IMiddleware
     {
         switch (exception)
         {
+            case BadRequestException:
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                break;
             case NotFoundException:
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                break;
+            case UnauthorizedException:
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 break;
             case not null:
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 break;
         }
 
-        var error = new Error
+        var error = new ErrorDto
         {
             StatusCode = context.Response.StatusCode,
             Message = exception != null ? exception.Message : "error"
         };
+
+        if (exception!.InnerException != null)
+        {
+            error.Message = exception.InnerException.Message;
+        }
 
         _logger.LogError(error.Message);
         await context.Response.WriteAsJsonAsync(error);

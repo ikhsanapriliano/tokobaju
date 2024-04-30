@@ -1,6 +1,6 @@
 namespace Tokobaju.Dto;
 
-public class Error
+public class ErrorDto
 {
     public required int StatusCode { get; set; }
     public required string Message { get; set; }
