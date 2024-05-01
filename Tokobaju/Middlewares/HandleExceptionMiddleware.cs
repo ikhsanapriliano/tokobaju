@@ -28,6 +28,10 @@ public class HandleExceptionMiddleware : IMiddleware
         {
             await HandleExceptionAsync(context, e);
         }
+        catch (ForbiddenResourceException e)
+        {
+            await HandleExceptionAsync(context, e);
+        }
         catch (Exception e)
         {
             await HandleExceptionAsync(context, e);
@@ -46,6 +50,9 @@ public class HandleExceptionMiddleware : IMiddleware
                 break;
             case UnauthorizedException:
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                break;
+            case ForbiddenResourceException:
+                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 break;
             case not null:
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
