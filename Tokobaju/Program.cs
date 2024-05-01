@@ -22,6 +22,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPersistence, Persistence>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<HandleExceptionMiddleware>();
 builder.Services.AddSingleton<BcryptUtil>();
 builder.Services.AddScoped<IJwtUtil, JwtUtil>();
@@ -37,7 +38,7 @@ builder.Services.AddAuthentication(options =>
         {
             ValidateAudience = false,
             ValidateIssuer = true,
-            ValidateLifetime = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             IssuerSigningKey =
