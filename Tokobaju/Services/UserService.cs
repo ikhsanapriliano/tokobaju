@@ -79,7 +79,7 @@ public class UserService : IUserService
         if (payload.Email != null) user.Email = payload.Email;
         if (photo != "")
         {
-            File.Delete(user.Photo);
+            if (!user.Photo.Contains("unknown")) File.Delete(user.Photo);
             user.Photo = photo;
         }
         user.UpdatedAt = DateTime.Now;

@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
                 photoName = photo.FileName;
                 break;
         }
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "users");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Users");
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

@@ -23,6 +23,7 @@ builder.Services.AddScoped<IPersistence, Persistence>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddTransient<HandleExceptionMiddleware>();
 builder.Services.AddSingleton<BcryptUtil>();
 builder.Services.AddScoped<IJwtUtil, JwtUtil>();
