@@ -61,7 +61,7 @@ public class UserController : Controller
         var photoPath = "";
         if (photo != null)
         {
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "users");
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "Users");
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
