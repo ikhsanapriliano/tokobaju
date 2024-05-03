@@ -11,12 +11,14 @@ public class UserService : IUserService
     private readonly IRepository<User> _repository;
     private readonly IPersistence _persistence;
     private readonly BcryptUtil _bcryptUtil;
+    private readonly IShoppingCartService _shoppingCartService;
 
-    public UserService(IRepository<User> repository, IPersistence persistence, BcryptUtil bcryptUtil)
+    public UserService(IRepository<User> repository, IPersistence persistence, BcryptUtil bcryptUtil, IShoppingCartService shoppingCartService)
     {
         _repository = repository;
         _persistence = persistence;
         _bcryptUtil = bcryptUtil;
+        _shoppingCartService = shoppingCartService;
     }
 
     public async Task<bool> ChangePassword(string id, ChangePasswordDto password)
@@ -43,10 +45,23 @@ public class UserService : IUserService
 
     public async Task<bool> Delete(string id)
     {
-        var user = await GetById(id);
-        _repository.Delete(user);
+        await _persistence.BeginTransactionAsync();
+        try
+        {
+            await _shoppingCartService.Delete(id);
+            await _persistence.SaveChangesAsync();
 
-        return true;
+            var user = await GetById(id);
+            _repository.Delete(user);
+            await _persistence.SaveChangesAsync();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            await _persistence.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<List<User>> GetAll()
