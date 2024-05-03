@@ -20,10 +20,10 @@ public class Product
     public required string Photo { get; set;}
 
     [Column("price")]
-    public required string Price { get; set;}
+    public required int Price { get; set;}
 
     [Column("stock")]
-    public required string Stock { get; set;}
+    public required int Stock { get; set;}
 
     [Column("category_id")]
     public required Guid CategoryId { get; set;}
