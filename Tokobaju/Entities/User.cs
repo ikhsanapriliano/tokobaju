@@ -33,5 +33,6 @@ public class User
     [Required, Column("updated_at")]
     public required DateTime UpdatedAt { get; set; }
 
+    public virtual ShoppingCart? ShoppingCart{ get; set; }
     public virtual Store? Store{ get; set; }
 }

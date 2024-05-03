@@ -13,13 +13,15 @@ public class AuthService : IAuthService
     private readonly IPersistence _persistence;
     private readonly BcryptUtil _bcryptUtil;
     private readonly IJwtUtil _JwtUtil;
+    private readonly IShoppingCartService _shoppingCartService;
 
-    public AuthService(IRepository<User> repository, IPersistence persistence, BcryptUtil bcryptUtil, IJwtUtil jwtUtil)
+    public AuthService(IRepository<User> repository, IPersistence persistence, BcryptUtil bcryptUtil, IJwtUtil jwtUtil, IShoppingCartService shoppingCartService)
     {
         _repository = repository;
         _persistence = persistence;
         _bcryptUtil = bcryptUtil;
         _JwtUtil = jwtUtil;
+        _shoppingCartService = shoppingCartService;
     }
 
     public async Task<LoginResponseDto> Login(LoginRequestDto payload)
@@ -47,35 +49,47 @@ public class AuthService : IAuthService
 
     public async Task<RegisterResponseDto> Register(string photo, RegisterRequestDto payload)
     {
-        if (payload.Password != payload.ConfirmPassword)
-        {
-            throw new BadRequestException("password and confirmPassword didn't match");
+        await _persistence.BeginTransactionAsync();
+        try
+        {   
+            if (payload.Password != payload.ConfirmPassword)
+            {
+                throw new BadRequestException("password and confirmPassword didn't match");
+            }
+
+            payload.Password = _bcryptUtil.HashPassword(payload.Password);
+
+            var user = new User
+            {
+                Name = payload.Name,
+                Email = payload.Email,
+                Password = payload.Password,
+                Role = Enum.Parse<ERole>("User", true),
+                Photo = photo,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            var data = await _repository.SaveAsync(user);
+            await _persistence.SaveChangesAsync();
+
+            await _shoppingCartService.Create(data.Id.ToString());
+            await _persistence.CommitTransactionAsync();
+
+            var registerResponse = new RegisterResponseDto
+            {
+                Id = data.Id,
+                Name = data.Name,
+                Email = data.Email,
+                Role = data.Role
+            };
+
+            return registerResponse;
         }
-
-        payload.Password = _bcryptUtil.HashPassword(payload.Password);
-
-        var user = new User
+        catch (Exception)
         {
-            Name = payload.Name,
-            Email = payload.Email,
-            Password = payload.Password,
-            Role = Enum.Parse<ERole>("User", true),
-            Photo = photo,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-
-        var data = await _repository.SaveAsync(user);
-        await _persistence.SaveChangesAsync();
-
-        var registerResponse = new RegisterResponseDto
-        {
-            Id = data.Id,
-            Name = data.Name,
-            Email = data.Email,
-            Role = data.Role
-        };
-
-        return registerResponse;
+            await _persistence.RollbackTransactionAsync();
+            throw;
+        }
     }
 }
