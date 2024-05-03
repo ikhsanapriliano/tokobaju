@@ -56,7 +56,7 @@ public class ProductCategoryService : IProductCategoryService
 
         if (productCategory == null)
         {
-            throw new NotFoundException($"data with id {id} not found");
+            throw new NotFoundException($"productCategory with id {id} not found");
         }
 
         return productCategory;
