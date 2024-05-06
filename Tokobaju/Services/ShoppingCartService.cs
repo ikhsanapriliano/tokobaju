@@ -1,4 +1,5 @@
 using Tokobaju.Entities;
+using Tokobaju.Exceptions;
 using Tokobaju.Repositories;
 
 namespace Tokobaju.Services;
@@ -35,5 +36,16 @@ public class ShoppingCartService : IShoppingCartService
         await _persistence.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<ShoppingCart> GetByUserId(string userId)
+    {
+        var data = await _repository.FindAsync(data => data.UserId.Equals(userId));
+        if (data == null)
+        {
+            throw new NotFoundException($"user with id {userId} doesn't have a shoppong cart");
+        }
+
+        return data;
     }
 }
