@@ -56,6 +56,11 @@ public class UserController : Controller
     [HttpPut, Authorize(Roles = "Admin, User")]
     public async Task<IActionResult> UpdateUser(IFormFile? photo, [FromForm] UpdateUserDto payload)
     {
+        if (photo == null && payload.Name == null && payload.Email == null)
+        {
+            throw new BadRequestException("nothing to change");
+        }
+
         var identity = HttpContext.User.Identity as ClaimsIdentity;
         var userId = identity!.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         var photoPath = "";
@@ -78,7 +83,7 @@ public class UserController : Controller
             photoPath = Path.Combine(folderPath, random.Next(00000000, 99999999).ToString() + fileExtension);
         }
 
-        var data = await _userService.Update(userId, photoPath, payload);
+        var data = await _userService.Update(userId, photoPath, payload!);
         var response = new ResponseDto
         {
             Message = "update success",
