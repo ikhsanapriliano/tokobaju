@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tokobaju.Repositories;
 
@@ -11,9 +12,11 @@ using Tokobaju.Repositories;
 namespace Tokobaju.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507073919_AddEntitiesIntoAppDbContext")]
+    partial class AddEntitiesIntoAppDbContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,6 +40,9 @@ namespace Tokobaju.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("order_date");
 
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("status");
@@ -54,6 +60,8 @@ namespace Tokobaju.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("UserId");
 
@@ -380,6 +388,10 @@ namespace Tokobaju.Migrations
 
             modelBuilder.Entity("Tokobaju.Entities.Order", b =>
                 {
+                    b.HasOne("Tokobaju.Entities.Order", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("Tokobaju.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -392,7 +404,7 @@ namespace Tokobaju.Migrations
             modelBuilder.Entity("Tokobaju.Entities.OrderDetail", b =>
                 {
                     b.HasOne("Tokobaju.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
+                        .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -478,7 +490,7 @@ namespace Tokobaju.Migrations
 
             modelBuilder.Entity("Tokobaju.Entities.Order", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Tokobaju.Entities.ProductCategory", b =>
